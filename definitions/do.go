@@ -35,6 +35,7 @@ type Do struct {
 	Type          string   `mapstructure:"," json:"," yaml:"," toml:","`
 	Task          string   `mapstructure:"," json:"," yaml:"," toml:","`
 	Tail          string   `mapstructure:"," json:"," yaml:"," toml:","`
+	Proxy         string   `mapstructure:"," json:"," yaml:"," toml:","`
 	ChainName     string   `mapstructure:"," json:"," yaml:"," toml:","`
 	ChainType     string   `mapstructure:"," json:"," yaml:"," toml:","`
 	GenesisFile   string   `mapstructure:"," json:"," yaml:"," toml:","`
@@ -66,8 +67,8 @@ type Do struct {
 	ConfigOpts    []string `mapstructure:"," json:"," yaml:"," toml:","`
 	AccountTypes  []string `mapstructure:"," json:"," yaml:"," toml:","`
 
-	// update 
-	Branch  string `mapstructure:"," json:"," yaml:"," toml:","`
+	// update
+	Branch string `mapstructure:"," json:"," yaml:"," toml:","`
 	// XXX below requested by @kootpv. to implement once command is stable
 	// Commit  string `mapstructure:"," json:"," yaml:"," toml:","`
 	// Version string `mapstructure:"," json:"," yaml:"," toml:","`

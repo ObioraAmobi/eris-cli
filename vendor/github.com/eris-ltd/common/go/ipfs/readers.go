@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -17,7 +18,7 @@ import (
 func GetFromIPFS(hash, fileName, dirName string, w io.Writer) error {
 	url := IPFSBaseGatewayUrl("") + hash
 	w.Write([]byte("GETing file from IPFS. Hash =>\t" + hash + ":" + fileName + "\n"))
-	return DownloadFromUrlToFile(url, fileName, dirName, w)
+	return DownloadFromUrlToFile(url, fileName, dirName, "", w) // no proxy for IPFS ?
 }
 
 func CatFromIPFS(fileHash string, w io.Writer) (string, error) {
@@ -96,8 +97,8 @@ func ListPinnedFromIPFS(w io.Writer) (string, error) {
 	return result, nil
 }
 
-func DownloadFromUrlToFile(url, fileName, dirName string, w io.Writer) error {
-	tokens := strings.Split(url, "/")
+func DownloadFromUrlToFile(url0, fileName, dirName, proxyURL string, w io.Writer) error {
+	tokens := strings.Split(url0, "/")
 	if fileName == "" {
 		fileName = tokens[len(tokens)-1]
 	}
@@ -105,7 +106,7 @@ func DownloadFromUrlToFile(url, fileName, dirName string, w io.Writer) error {
 	//use absolute paths?
 	endPath := path.Join(dirName, fileName)
 	if dirName != "" {
-		w.Write([]byte("Downloading " + url + " to " + endPath + "\n"))
+		w.Write([]byte("Downloading " + url0 + " to " + endPath + "\n"))
 		checkDir, err := os.Stat(dirName)
 		if err != nil {
 			w.Write([]byte("Directory does not exist, creating it"))
@@ -119,7 +120,7 @@ func DownloadFromUrlToFile(url, fileName, dirName string, w io.Writer) error {
 		}
 	} else {
 		//dirNAme = getwd
-		w.Write([]byte("Downloading " + url + " to " + fileName + "\n"))
+		w.Write([]byte("Downloading " + url0 + " to " + fileName + "\n"))
 	}
 
 	var outputInDir *os.File
@@ -139,14 +140,25 @@ func DownloadFromUrlToFile(url, fileName, dirName string, w io.Writer) error {
 		defer outputFile.Close()
 	}
 
-	// adding manual timeouts as IPFS hangs for a while
-	transport := http.Transport{
-		Dial: dialTimeout,
+	transport := http.Transport{Dial: dialTimeout}
+
+	if proxyURL == "" {
+		transport = http.Transport{Proxy: nil}
+	} else {
+		urli := url.URL{}
+		urlProxy, err := urli.Parse(proxyURL)
+		if err != nil {
+			return err
+		}
+		transport = http.Transport{Proxy: http.ProxyURL(urlProxy)}
 	}
+
+	// adding manual timeouts as IPFS hangs for a while
 	client := http.Client{
 		Transport: &transport,
 	}
-	response, err := client.Get(url)
+
+	response, err := client.Get(url0)
 	if err != nil {
 		return err
 	}
