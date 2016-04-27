@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/eris-ltd/common/go/common"
 )
 
 //XXX this command absolutely needs a good test!!
@@ -34,9 +35,9 @@ func dirCheckMaker(dirsToMigrate map[string]string) (map[string]string, bool) {
 
 	for depDir, newDir := range dirsToMigrate {
 		log.WithFields(log.Fields{
-			"old":       depDir,
+			"old":        depDir,
 			"old exists": DoesDirExist(depDir),
-			"new":       newDir,
+			"new":        newDir,
 			"new exists": DoesDirExist(newDir),
 		}).Debug("Checking Directories to Migrate")
 		if !DoesDirExist(depDir) && DoesDirExist(newDir) { //already migrated, nothing to see here
@@ -50,7 +51,7 @@ func dirCheckMaker(dirsToMigrate map[string]string) (map[string]string, bool) {
 
 func canWeMigrate() bool {
 	log.Warn("Permission to migrate deprecated directories required")
-	if QueryYesOrNo("Would you like to continue?") == Yes {
+	if common.QueryYesOrNo("Would you like to continue?") == common.Yes {
 		log.Debug("Confirmation verified. Proceeding")
 		return true
 	} else {

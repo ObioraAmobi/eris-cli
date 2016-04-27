@@ -25,15 +25,15 @@ import (
 
 // XXX all files in this sequence must be added to both
 // the respective GH repo & mindy testnet (pinkpenguin.interblock.io:46657/list_names)
-func dropServiceDefaults(dir, from string) error {
-	if err := drops(ver.SERVICE_DEFINITIONS, "services", dir, from); err != nil {
+func dropServiceDefaults(dir, from, proxy string) error {
+	if err := drops(ver.SERVICE_DEFINITIONS, "services", dir, from, proxy); err != nil {
 		return err
 	}
 	return nil
 }
 
-func dropActionDefaults(dir, from string) error {
-	if err := drops(ver.ACTION_DEFINITIONS, "actions", dir, from); err != nil {
+func dropActionDefaults(dir, from, proxy string) error {
+	if err := drops(ver.ACTION_DEFINITIONS, "actions", dir, from, proxy); err != nil {
 		return err
 	}
 	if err := writeDefaultFile(common.ActionsPath, "do_not_use.toml", defAct); err != nil {
@@ -42,8 +42,8 @@ func dropActionDefaults(dir, from string) error {
 	return nil
 }
 
-func dropChainDefaults(dir, from string) error {
-	if err := drops(ver.CHAIN_DEFINITIONS, "chains", dir, from); err != nil {
+func dropChainDefaults(dir, from, proxy string) error {
+	if err := drops(ver.CHAIN_DEFINITIONS, "chains", dir, from, proxy); err != nil {
 		return err
 	}
 
@@ -161,7 +161,7 @@ func pullDefaultImages() error {
 	return nil
 }
 
-func drops(files []string, typ, dir, from string) error {
+func drops(files []string, typ, dir, from, proxy string) error {
 	//to get from rawgit
 	var repo string
 	if typ == "services" {
@@ -184,14 +184,14 @@ func drops(files []string, typ, dir, from string) error {
 			url := fmt.Sprintf("%s:11113/getfile/%s", ipfs.SexyUrl(), file)
 			log.WithField(file, url).Debug("Getting file from url")
 			log.WithField(file, dir).Debug("Dropping file to")
-			if err := ipfs.DownloadFromUrlToFile(url, file, dir, buf); err != nil {
+			if err := ipfs.DownloadFromUrlToFile(url, file, dir, proxy, buf); err != nil {
 				return err
 			}
 		}
 	} else if from == "rawgit" {
 		for _, file := range files {
 			log.WithField(file, dir).Debug("Getting file from GitHub, dropping into:")
-			if err := util.GetFromGithub("eris-ltd", repo, "master", file, dir, file, buf); err != nil {
+			if err := util.GetFromGithub("eris-ltd", repo, "master", file, dir, file, proxy, buf); err != nil {
 				return err
 			}
 		}

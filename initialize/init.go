@@ -66,15 +66,15 @@ func InitDefaults(do *definitions.Do, newDir bool) error {
 
 	tsErrorFix := "toadserver may be down: re-run with `--source=rawgit`"
 
-	if err := dropServiceDefaults(srvPath, do.Source); err != nil {
+	if err := dropServiceDefaults(srvPath, do.Source, do.Proxy); err != nil {
 		return fmt.Errorf("%v\n%s\n", err, tsErrorFix)
 	}
 
-	if err := dropActionDefaults(actPath, do.Source); err != nil {
+	if err := dropActionDefaults(actPath, do.Source, do.Proxy); err != nil {
 		return fmt.Errorf("%v\n%s\n", err, tsErrorFix)
 	}
 
-	if err := dropChainDefaults(chnPath, do.Source); err != nil {
+	if err := dropChainDefaults(chnPath, do.Source, do.Proxy); err != nil {
 		return fmt.Errorf("%v\n%s\n", err, tsErrorFix)
 	}
 
@@ -122,7 +122,7 @@ func checkIfCanOverwrite(doYes bool) error {
 		"actions path":  common.ActionsPath,
 		"chains path":   common.ChainsPath,
 	}).Warn("Continuing may overwrite files in")
-	if util.QueryYesOrNo("Do you wish to continue?") == util.Yes {
+	if common.QueryYesOrNo("Do you wish to continue?") == common.Yes {
 		log.Debug("Confirmation verified. Proceeding")
 	} else {
 		log.Warn("The marmots will not proceed without your permission")
@@ -149,7 +149,7 @@ on local host machines. If you already have the images, they'll be updated.
 		log.WithField("ERIS_PULL_APPROVE", "true").Warn("Skip confirmation with")
 		log.Warn()
 
-		if util.QueryYesOrNo("Do you wish to continue?") == util.Yes {
+		if common.QueryYesOrNo("Do you wish to continue?") == common.Yes {
 			if err := pullDefaultImages(); err != nil {
 				return err
 			}

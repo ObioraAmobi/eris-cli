@@ -1,7 +1,6 @@
 package perform
 
 import (
-	"time"
 	"archive/tar"
 	"bytes"
 	"errors"
@@ -14,6 +13,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 	"unicode"
 
 	log "github.com/Sirupsen/logrus"
@@ -656,7 +656,7 @@ func DockerRemoveImage(name string, force bool) error {
 // Function is ~ to `docker build -t imageName .`
 // where a Dockerfile is in the `pwd`
 func DockerBuild(imageName, dockerfile string) error {
-	// below has been adapted from: 
+	// below has been adapted from:
 	// https://godoc.org/github.com/fsouza/go-dockerclient#Client.BuildImage
 	// and could probably be much more elegant
 	t := time.Now()
@@ -677,8 +677,8 @@ func DockerBuild(imageName, dockerfile string) error {
 		Name: imageName,
 		//Dockerfile: dockerfile,
 		RmTmpContainer: true,
-		InputStream: inputbuf,
-		OutputStream: w,
+		InputStream:    inputbuf,
+		OutputStream:   w,
 		//OutputStream: outputbuf,
 		RawJSONStream: true,
 	}
@@ -781,7 +781,7 @@ func createContainer(opts docker.CreateContainerOptions) (*docker.Container, err
 		if err == docker.ErrNoSuchImage {
 			if os.Getenv("ERIS_PULL_APPROVE") != "true" {
 				log.WithField("image", opts.Config.Image).Warn("The Docker image not found locally")
-				if util.QueryYesOrNo("Would you like the marmots to pull it from the repository?") == util.Yes {
+				if dirs.QueryYesOrNo("Would you like the marmots to pull it from the repository?") == dirs.Yes {
 					log.Debug("User assented to pull")
 				} else {
 					log.Debug("User refused to pull")
