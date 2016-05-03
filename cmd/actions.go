@@ -55,11 +55,10 @@ func buildActionsCommand() {
 
 // Actions Sub-sub-Commands
 var actionsImport = &cobra.Command{
-	Use:   "import NAME LOCATION",
-	Short: "Import an action definition file from Github or IPFS.",
-	Long: `Import an action definition for your platform.
+	Use:   "import NAME HASH",
+	Short: "Import an action definition file from IPFS.",
+	Long: `Import an action definition for your platform.`,
 
-By default, Eris will import from ipfs.`,
 	Example: "$ eris actions import \"do not use\" QmNUhPtuD9VtntybNqLgTTevUmgqs13eMvo2fkCwLLx5MX",
 	Run:     ImportAction,
 }
@@ -169,7 +168,7 @@ func addActionsFlags() {
 func ImportAction(cmd *cobra.Command, args []string) {
 	IfExit(ArgCheck(2, "eq", cmd, args))
 	do.Name = args[0]
-	do.Path = args[1]
+	do.Hash = args[1]
 	IfExit(act.ImportAction(do))
 }
 
